@@ -27,13 +27,27 @@ jobs:
 
       - name: Push Docker image
         run: docker push ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        
+  update:
+    name: Update Helm Manifests
+    runs-on: ubuntu-latest
+    needs: build
 
-      - name: Update values.yaml
-        run: |
-          cd nodeapp
-          sed -i 's|APP_VERSION:.*|APP_VERSION: '${{ github.sha }}'|' values.yaml 
-          git config --global user.name 'itsmespartan08'
-          git config --global user.email 'jhairehtenorio@gmail.com'
-          git add values.yaml
-          git commit -m "Update values.yaml"
-          git push
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Update Image Tag Values
+      run: |
+        chart_dir="chart"
+        new_image_tag=${{ github.sha }}
+
+        # Update the values.yaml file with the new image tag
+        sed -i "s/^  tag: .*/  tag: $new_image_tag/" "$chart_dir/values.yaml"
+    
+    - name: Commit the changes made
+      run: | 
+        git config --global user.name 'itsmespartan08'
+        git config --global user.email 'jhairehtenorio@gmail.com'
+        git commit -am "updating image tag"
+        git push
