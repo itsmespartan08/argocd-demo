@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: itsmespartan08/node-app
+  repository: itsmespartan08/nodeapp
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
 imagePullSecrets: []
